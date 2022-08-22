@@ -1,0 +1,4 @@
+---
+saved_path: "/mnt/fengyao.hjj/argument_mining/new_checkpoints/new_word"
+model:
+  use_word: True
