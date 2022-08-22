@@ -11,7 +11,8 @@ from text_processor import read_examples, convert_examples_to_features
 MAX_PASSAGE_LEN = 400
 MAX_TEXT_LEN = 50
 
-BASEDIR = '/mnt/fengyao.hjj/argument_mining/'
+BASEDIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+print('BASEDIR: ', BASEDIR)
 char_path = os.path.join(BASEDIR, "pretrained_model/FinBERT_L-12_H-768_A-12_pytorch/vocab.txt")
 word_path = os.path.join(BASEDIR, 'pretrained_model/paraphrase-xlm-r-multilingual-v1')
 char_base = BertTokenizer.from_pretrained(char_path, do_lower_case=True)
@@ -181,22 +182,16 @@ def annotation_transform(csv_paths):
                 results[set_name]["word_id"].append(word_id)
                 results[set_name]["word_mask"].append(word_mask)
                 results[set_name]["label"].append(labels[idx])
-    res['train'].to_csv("/mnt/fengyao.hjj/transformers/data/pgc/0506/train.1.csv", index=False)
-    res['val'].to_csv("/mnt/fengyao.hjj/transformers/data/pgc/0506/dev.1.csv", index=False)
-    res['test'].to_csv("/mnt/fengyao.hjj/transformers/data/pgc/0506/test.1.csv", index=False)
+    res['train'].to_csv(os.path.join(BASEDIR, "antcritic/train.1.csv"), index=False)
+    res['val'].to_csv(os.path.join(BASEDIR, "antcritic/dev.1.csv"), index=False)
+    res['test'].to_csv(os.path.join(BASEDIR, "antcritic/test.1.csv"), index=False)
     return results, lengths
 
 
-# data, lengths = annotation_transform(["./raw_data/train.collect.csv",
-#                                     "./raw_data/dev.collect.csv",
-#                                     "./raw_data/test.collect.csv"])
-# data, lengths = annotation_transform(["/mnt/fengyao.hjj/transformers/data/topic_pgc/topic_pgc_clean.csv"])
-data, lengths = annotation_transform(["/mnt/fengyao.hjj/transformers/data/pgc/0506/train.collect.csv",
-                                    "/mnt/fengyao.hjj/transformers/data/pgc/0506/dev.collect.csv",
-                                    "/mnt/fengyao.hjj/transformers/data/pgc/0506/test.collect.csv"])
+data, lengths = annotation_transform([os.path.join(BASEDIR, "antcritic/all.collect.csv")])
 
 for set_key in data.keys():
-    file = h5py.File(set_key + "_1.hdf5", "w")
+    file = h5py.File(os.path.join(BASEDIR, "antcritic/{}_1.hdf5".format(set_key)), "w")
     for input_key in data[set_key].keys():
         file.create_dataset(input_key, data=np.array(data[set_key][input_key]).astype(np.int32))
     file.attrs["size"] = lengths[set_key]

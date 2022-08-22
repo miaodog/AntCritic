@@ -11,3 +11,4 @@ gen
 /pretrained_model
 /*.log
 __pycache__
+antcritic

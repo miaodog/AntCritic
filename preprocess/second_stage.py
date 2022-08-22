@@ -9,7 +9,7 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 from tqdm import tqdm
 from transformers import BertTokenizer
-
+import os
 from models import FirstStageModel
 from utils.text_processor import read_examples, convert_examples_to_features
 
@@ -357,8 +357,9 @@ def annotation_transform(csv_paths, modules, has_target=True):
     return result, lengths
 
 
-import os
-BASEDIR = '/mnt/fengyao.hjj/argument_mining/'
+
+BASEDIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+print('BASEDIR: ', BASEDIR)
 char_path = os.path.join(BASEDIR, "pretrained_model/FinBERT_L-12_H-768_A-12_pytorch")
 word_path = os.path.join(BASEDIR, 'pretrained_model/paraphrase-xlm-r-multilingual-v1')
 char_base = BertTokenizer.from_pretrained(char_path, do_lower_case=True)
@@ -395,22 +396,12 @@ if __name__ == "__main__":
     pred = args.pred
 
     if file is None or pred is None:
-        # results, lengths = annotation_transform(["./raw_data/train.collect.csv",
-        #                                          "./raw_data/dev.collect.csv",
-        #                                          "./raw_data/test.collect.csv"],
-        #                                          (char_tokenizer, char_model, word_tokenizer, word_model))
-
-        # results, lengths = annotation_transform(["/mnt/fengyao.hjj/transformers/data/0301/train.collect.csv",
-        #                                     "/mnt/fengyao.hjj/transformers/data/0301/dev.collect.csv",
-        #                                     "/mnt/fengyao.hjj/transformers/data/0301/test.collect.csv"],
-        #                                          (char_tokenizer, char_model, word_tokenizer, word_model))
-
-        results, lengths = annotation_transform(["/mnt/fengyao.hjj/transformers/data/pgc/0506/train.collect.csv",
-                                                "/mnt/fengyao.hjj/transformers/data/pgc/0506/dev.collect.csv",
-                                                "/mnt/fengyao.hjj/transformers/data/pgc/0506/test.collect.csv"],
+        results, lengths = annotation_transform([os.path.join(BASEDIR, "antcritic/train.1.csv"),
+                                                os.path.join(BASEDIR, "antcritic/dev.1.csv"),
+                                                os.path.join(BASEDIR, "antcritic/test.1.csv")],
                                                  (char_tokenizer, char_model, word_tokenizer, word_model))
         for set_key in results.keys():
-            file = h5py.File(set_key + "_2.hdf5", "w")
+            file = h5py.File(os.path.join(BASEDIR, "antcritic/{}_2.hdf5".format(set_key)), "w")
             for input_key in results[set_key].keys():
                 try:
                     file.create_dataset(input_key, data=np.array(results[set_key][input_key]))
