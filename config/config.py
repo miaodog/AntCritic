@@ -14,13 +14,11 @@ _c.max_epoch = 12
 _c.text_embd_dims = 768
 _c.max_sentence_num = 400
 _c.model_dim = 384
-# _c.root = "/home/zhaoyang/argument" # "/mnt/workspace/wenyu.zy/argument_mining/"
 _c.root = "/mnt/fengyao.hjj/argument_mining/"
-_c.data_root = "/mnt/fengyao.hjj/transformers/data/pgc/0506/"
+
 
 _c.dataset = CN()
 _c.dataset.batch_size = 8
-# _c.dataset.batch_size = 128
 _c.dataset.neighbor_size = 5
 _c.dataset.max_len = _c.max_sentence_num
 
