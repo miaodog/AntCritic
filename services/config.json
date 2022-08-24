@@ -1,0 +1,19 @@
+{
+    "ops": [
+        {
+            "name": "ant_critic",
+            "configs": {
+                "model_config": "config/config.py",
+                "char_model_path": "checkpoints/char/models-9.pt",
+                "word_model_path": "checkpoints/word/models-12.pt",
+                "model_name_or_path": "checkpoints/GRU/models-7.pt"
+            },
+            "timeout": 50000
+        }
+    ],
+    "global": {
+        "metrics": {
+            "app_name": "inference"
+        }
+    }
+}

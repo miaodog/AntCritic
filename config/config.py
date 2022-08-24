@@ -1,20 +1,21 @@
 import math
-
+import os
 from yacs.config import CfgNode as CN
 
 _c = CN()
-
+BASEDIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+print('BASEDIR: ', BASEDIR)
 _c.display_interval = 10
 # _c.saved_path = "new_checkpoints/second_1" # "/home/wenyu.zy/argument/checkpoints/second"
 # _c.saved_path = "/mnt/fengyao.hjj/argument_mining/new_checkpoints/new_char"
 # _c.saved_path = "/mnt/fengyao.hjj/argument_mining/new_checkpoints/new_word"
-_c.saved_path = "/mnt/fengyao.hjj/argument_mining/new_checkpoints/second_gru_nofl_8"
+# _c.saved_path = "/mnt/fengyao.hjj/argument_mining/new_checkpoints/second_gru_nofl_8"
 
 _c.max_epoch = 12
 _c.text_embd_dims = 768
 _c.max_sentence_num = 400
 _c.model_dim = 384
-_c.root = "/mnt/fengyao.hjj/argument_mining/"
+_c.root = BASEDIR
 
 
 _c.dataset = CN()
@@ -55,7 +56,6 @@ _c.optimizer.loss.label = 1
 _c.optimizer.loss.grid = 1
 _c.optimizer.loss.major = 1
 _c.optimizer.loss.margin = 0.2
-
 
 
 def get_cfg_defaults():
