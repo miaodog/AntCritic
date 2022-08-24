@@ -34,8 +34,8 @@ def stopwords2(file):
     with codecs.open(file, 'r', encoding='utf-8') as f:
         stopwords = [w.strip() for w in f.readlines()]
     return stopwords
-STOPWORDS1 = stopwords1('/Users/fengyao/PycharmProjects/argument_mining/match_topic/res/filter_keywords.txt')
-PREFIX = stopwords2('/Users/fengyao/PycharmProjects/argument_mining/match_topic/res/stopwords.txt')
+STOPWORDS1 = stopwords1(os.path.join(cur_path, "res/filter_keywords.txt"))
+PREFIX = stopwords2(os.path.join(cur_path, "res/stopwords.txt"))
 
 
 
@@ -418,19 +418,22 @@ def print_res(res, topic_keywords):
             print("===========raw_premise===========")
             for pin, pre in enumerate(re['rpremises']):
                 print(f"premise {pin}: {pre} {re['premises2claims'][pin]}")
-    # for t, re in res.items():
-    #     if re['pgc2topic'] and not re['claim2topic']:
-    #         print('\n\n')
-    #         print(colored(f"==========={re['title']}===========", 'blue'))
-    #         print(re['src'])
-    #         print(f"===========show claim===========")
-    #         if re['show_claim']:
-    #             print(f"show claim {reformate_text(re['show_claim'])}")
-    #         print(f"===========major claim===========")
-    #         print(f"major claim: {re['major']}")
-    #         print("===========raw_claim===========")
-    #         for cin, cl in enumerate(re['rclaims']):
-    #             print(f"claim {cin}: {cl} {re['claims2premises'][cin]}")
+    for t, re in res.items():
+        if re['pgc2topic'] and not re['claim2topic']:
+            print('\n\n')
+            print(colored(f"==========={re['title']}===========", 'blue'))
+            print(re['src'])
+            print(f"===========show claim===========")
+            if re['show_claim']:
+                print(f"show claim {reformate_text(re['show_claim'])}")
+            print(f"===========major claim===========")
+            print(f"major claim: {re['major']}")
+            print("===========raw_claim===========")
+            for cin, cl in enumerate(re['rclaims']):
+                print(f"claim {cin}: {cl} {re['claims2premises'][cin]}")
+            print("===========raw_premise===========")
+            for pin, pre in enumerate(re['rpremises']):
+                print(f"premise {pin}: {pre} {re['premises2claims'][pin]}")
     for t, re in res.items():
         if re['claim2topic'] and not re['pgc2topic']:
             print('\n\n')
@@ -438,14 +441,14 @@ def print_res(res, topic_keywords):
             print(re['src'])
             print(f"===========show claim===========")
             print(f"show claim {reformate_text(re['show_claim'])}")
-            # print(f"===========major claim===========")
-            # print(f"major claim: {re['major']}")
-            # print("===========raw_claim===========")
-            # for cin, cl in enumerate(re['rclaims']):
-            #     print(f"claim {cin}: {cl} {re['claims2premises'][cin]}")
-            # print("===========raw_premise===========")
-            # for pin, pre in enumerate(re['rpremises']):
-            #     print(f"premise {pin}: {pre} {re['premises2claims'][pin]}")
+            print(f"===========major claim===========")
+            print(f"major claim: {re['major']}")
+            print("===========raw_claim===========")
+            for cin, cl in enumerate(re['rclaims']):
+                print(f"claim {cin}: {cl} {re['claims2premises'][cin]}")
+            print("===========raw_premise===========")
+            for pin, pre in enumerate(re['rpremises']):
+                print(f"premise {pin}: {pre} {re['premises2claims'][pin]}")
             # print("===========claim & premise = blocks===========")
             # for bin, bl in enumerate(re['blocks']):
             #     print(f"block {bin}: {bl} {re['cinblocks'][bin]}")

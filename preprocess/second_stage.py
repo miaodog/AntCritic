@@ -33,7 +33,7 @@ def generate_char_tokenizer(tokenizer):
     return char_tokenizer
 
 def generate_word_tokenizer(path):
-    model = SentenceTransformer(path, device='cuda:0')
+    model = SentenceTransformer(path, device=torch_device)
     model.eval()
     def word_tokenizer(text):
         result = model.tokenize([text])
