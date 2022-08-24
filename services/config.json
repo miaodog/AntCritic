@@ -1,7 +1,7 @@
 {
     "ops": [
         {
-            "name": "ant_critic",
+            "name": "argument_mining",
             "configs": {
                 "model_config": "config/use_gru.yaml",
                 "char_model_path": "checkpoints/char/models-9.pt",

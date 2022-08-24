@@ -1,9 +1,8 @@
 
-root=/mnt/fengyao.hjj
-cognition_framework_home=${root}/cognition/src/cognition
-project_home=/mnt/fengyao.hjj/m2-title-generation
-export PATH=${root}/miniconda3/envs/antmmf/bin:$PATH
-export PYTHONPATH=${root}/cognition/src:${project_home}:${project_home}/transformers/src/:${root}/miniconda3/envs/antmmf/lib
+cognition_framework_home=/mnt/fengyao.hjj/cognition/src/cognition
+project_home=/mnt/fengyao.hjj/argument_mining
+export PATH=/root/miniconda3/envs/antcritic/bin:$PATH
+export PYTHONPATH=/mnt/fengyao.hjj/cognition/src:${project_home}:/root/miniconda3/envs/antcritic/lib
 
 python ${cognition_framework_home}/run.py \
       --src=${project_home}/services/inference_ops.py \

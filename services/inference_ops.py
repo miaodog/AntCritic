@@ -15,9 +15,10 @@ class ArgumentMiningSession(cf.CfSession):
     def __init__(self):
         op_logger.info("init ArgumentMiningSession")
         self.support_versions = [cur_version]
-        self.params_dict_str = ""
-        self.content_id_str = ""
+        self.item_id_str = ""
+        self.title_str = ""
         self.content_str = ""
+        self.params_dict_str = ""
 
 
 @cf.service("inference")
@@ -73,5 +74,5 @@ class BlurDetService:
         self.params_dict_str = tf.placeholder(tf.string)
         # 调用op，注意此处要传入的参数
         argument_mining = cf.add_node(cf.OpNode("argument_mining"),
-                                             [self.content_id_str, self.title_str, self.content_str, self.params_dict_str])
+                                             [self.item_id_str, self.title_str, self.content_str, self.params_dict_str])
         return (argument_mining, [self.item_id_str, self.content_str, self.params_dict_str])

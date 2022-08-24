@@ -11,3 +11,4 @@ gen
 /antcritic
 /*.log
 __pycache__
+*.tar.gz
