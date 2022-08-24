@@ -189,6 +189,7 @@ class ArgumentMining:
         res = res2dict(df)
         res = beautiful_claim_premise(res)
         result = []
+        major = False
         for t, resu in res.items():
             print(f"major claim: {resu['major']}")
             if len(resu['major']) > 0:
@@ -199,17 +200,19 @@ class ArgumentMining:
                     'score': max(major_logits.tolist()),
                     'extTag': {'id': f'{content_id}_majorclaim', 'sents': [str(o) for o in list(resu['major'][0].keys())]}
                   })
+                major = True
             for cin, cl in enumerate(resu['rclaims'][0:8]):
-                print(f"claim {cin}: {cl} {resu['claims2premises'][cin]}")
-                if len(result) == 0 and len(''.join(list(cl.values()))) > 7:
-                    result.append({
+                cpremises = []
+                if not major and len(''.join(list(cl.values()))) > 7:
+                    result.insert(0,
+                        {
                         'tagValue': 'majorClaim',
                         'tagName': '主论点',
                         'text': ''.join(list(cl.values())),
-                        'score': 0,
+                        'score': max(major_logits.tolist()),
                         'extTag': {'id': f'{content_id}_majorclaim', 'sents': [str(o) for o in list(cl.keys())]}
-                    })
-                cpremises = []
+                      })
+                    major = True
                 for pin, pre in enumerate(resu['rpremises']):
                     if cin in resu['premises2claims'][pin]:
                         cpremises.append({'text': ''.join(list(pre.values())), 'sents': [str(o) for o in list(pre.keys())], 'relation': -1})
@@ -222,6 +225,15 @@ class ArgumentMining:
                 })
             for pin, pre in enumerate(resu['rpremises']):
                 print(f"premise {pin}: {pre} {resu['premises2claims'][pin]}")
+            if not major:
+                result.insert(0,
+                              {
+                                  'tagValue': 'majorClaim',
+                                  'tagName': '主论点',
+                                  'text': resu['sents'][np.argmax(major_logits.tolist())],
+                                  'score': max(major_logits.tolist()),
+                                  'extTag': {'id': f'{content_id}_majorclaim', 'sents': [str(np.argmax(major_logits.tolist()))]}
+                              })
         for re in result:
             print(json.dumps(re, indent=4, ensure_ascii=False))
         self.end = time.time()
