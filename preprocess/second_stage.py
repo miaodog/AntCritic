@@ -1,7 +1,9 @@
 import copy
 import random
 import sys
-sys.path.append('/mnt/fengyao.hjj/argument_mining')
+import os
+BASEDIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+sys.path.append(BASEDIR)
 import pandas as pd
 import h5py
 import torch
@@ -12,7 +14,8 @@ from transformers import BertTokenizer
 import os
 from models import FirstStageModel
 from utils.text_processor import read_examples, convert_examples_to_features
-
+torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
+print(f'torch_device: {torch_device}')
 
 MAX_PASSAGE_LEN = 400
 MAX_TEXT_LEN = 50
@@ -23,8 +26,8 @@ def generate_char_tokenizer(tokenizer):
         examples = read_examples(text, 0)
         features = convert_examples_to_features(examples=examples, seq_length=MAX_TEXT_LEN,
                                                 tokenizer=tokenizer)
-        char_id = torch.from_numpy(np.array(features[0].input_ids).astype(np.int64)).cuda()
-        char_mask = torch.from_numpy(np.array(features[0].input_mask).astype(np.int64)).cuda()
+        char_id = torch.from_numpy(np.array(features[0].input_ids).astype(np.int64)).to(torch_device)
+        char_mask = torch.from_numpy(np.array(features[0].input_mask).astype(np.int64)).to(torch_device)
         char_len = char_mask.sum()
         return char_id, char_mask, char_len
     return char_tokenizer
@@ -34,18 +37,18 @@ def generate_word_tokenizer(path):
     model.eval()
     def word_tokenizer(text):
         result = model.tokenize([text])
-        word_id = torch.from_numpy(zero_pad(result["input_ids"].squeeze(0).long().cpu().numpy(), MAX_TEXT_LEN)).cuda()
-        mask = torch.from_numpy(zero_pad(result["attention_mask"].squeeze(0).long().cpu().numpy(), MAX_TEXT_LEN)).cuda()
+        word_id = torch.from_numpy(zero_pad(result["input_ids"].squeeze(0).long().cpu().numpy(), MAX_TEXT_LEN)).to(torch_device)
+        mask = torch.from_numpy(zero_pad(result["attention_mask"].squeeze(0).long().cpu().numpy(), MAX_TEXT_LEN)).to(torch_device)
         word_len = mask.sum()
         return word_id, mask, word_len
     return word_tokenizer
 
 def load_model(pretrained_path, checkpoint_path, use_word):
     if not use_word:
-        model = FirstStageModel({"char_path": pretrained_path}, use_word=False).cuda()
+        model = FirstStageModel({"char_path": pretrained_path}, use_word=False).to(torch_device)
     else:
-        model = FirstStageModel({"word_path": pretrained_path}, use_word=True).cuda()
-    state_dict = torch.load(checkpoint_path)
+        model = FirstStageModel({"word_path": pretrained_path}, use_word=True).to(torch_device)
+    state_dict = torch.load(checkpoint_path, map_location=torch.device(torch_device))
     parameters = state_dict['model_parameters']
     model.load_state_dict(parameters)
     model.eval()
@@ -357,14 +360,11 @@ def annotation_transform(csv_paths, modules, has_target=True):
     return result, lengths
 
 
-
-BASEDIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-print('BASEDIR: ', BASEDIR)
 char_path = os.path.join(BASEDIR, "pretrained_model/FinBERT_L-12_H-768_A-12_pytorch")
 word_path = os.path.join(BASEDIR, 'pretrained_model/paraphrase-xlm-r-multilingual-v1')
-char_base = BertTokenizer.from_pretrained(char_path, do_lower_case=True)
-char_model_path = os.path.join(BASEDIR, "new_checkpoints/new_char/models-9.pt")
-word_model_path = os.path.join(BASEDIR, "new_checkpoints/new_word/models-12.pt")
+char_base = BertTokenizer.from_pretrained(char_path, do_lowcheckpointser_case=True)
+char_model_path = os.path.join(BASEDIR, "checkpoints/char/models-9.pt")
+word_model_path = os.path.join(BASEDIR, "checkpoints/word/models-12.pt")
 char_pretrained = os.path.join(BASEDIR, "pretrained_model/FinBERT_L-12_H-768_A-12_pytorch")
 word_pretrained = os.path.join(BASEDIR, "pretrained_model/paraphrase-xlm-r-multilingual-v1")
 char_tokenizer = generate_char_tokenizer(char_base)

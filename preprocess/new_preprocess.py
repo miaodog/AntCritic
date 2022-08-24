@@ -1,5 +1,5 @@
 import os.path
-
+import torch
 import h5py
 import pandas as pd
 import numpy as np
@@ -10,6 +10,8 @@ from text_processor import read_examples, convert_examples_to_features
 
 MAX_PASSAGE_LEN = 400
 MAX_TEXT_LEN = 50
+torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
+print(f'torch_device: {torch_device}')
 
 BASEDIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 print('BASEDIR: ', BASEDIR)
@@ -42,7 +44,8 @@ def generate_char_tokenizer(tokenizer):
     return char_tokenizer
 
 def generate_word_tokenizer(path):
-    model = SentenceTransformer(path, device='cuda:0')
+    print('generate_word_tokenizer: ', path)
+    model = SentenceTransformer(path, device=torch_device)
     model.eval()
     def word_tokenizer(text):
         result = model.tokenize([text])
