@@ -34,13 +34,13 @@ def adjust_label(label, grid):
     return label
 # 0: Others, 1: Claim, 2: Premise, 3: Major
 
-data_root = "/mnt/fengyao.hjj/transformers/data/pgc/0506"
+BASEDIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+data_root = os.path.join(BASEDIR, "antcritic")
 
 class SecondStageDataset(Dataset):
     def __init__(self, split, config, test_data_file=None):
         super().__init__()
         self.config = config
-        print('config --- : ', config)
         if split == 'test' and test_data_file is not None:
             self.embedding_path = test_data_file
             self.annotation_path = ''
@@ -52,6 +52,7 @@ class SecondStageDataset(Dataset):
             self.length = f.attrs["size"]
 
     def _open_hdf5(self):
+        print('_open_hdf5: ', self.embedding_path)
         self.embedding = h5py.File(self.embedding_path, 'r')
         if os.path.exists(self.annotation_path):
             self.annotation = h5py.File(self.annotation_path, 'r')
