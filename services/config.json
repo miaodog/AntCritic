@@ -3,10 +3,10 @@
         {
             "name": "ant_critic",
             "configs": {
-                "model_config": "config/config.py",
+                "model_config": "config/use_gru.yaml",
                 "char_model_path": "checkpoints/char/models-9.pt",
                 "word_model_path": "checkpoints/word/models-12.pt",
-                "model_name_or_path": "checkpoints/GRU/models-7.pt"
+                "model_name_or_path": "checkpoints/second_gru_nofl_8/models-7.pt"
             },
             "timeout": 50000
         }

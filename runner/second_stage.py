@@ -19,10 +19,18 @@ from utils.helper import move_to_cuda, move_to_cpu
 from utils.processor import tuple2dict
 from utils.timer import Timer
 import pandas as pd
-torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
+torch_device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 print(f'torch_device: {torch_device}')
 if 'cuda' not in torch_device:
     os.environ['OMP_NUM_THREADS'] = '1'
+
+# 显示所有列
+# pd.set_option('display.max_columns', None)
+# 显示所有行
+pd.set_option('display.max_rows', None)
+# 设置value的显示长度为100，默认为50
+pd.set_option('max_colwidth', 30)
+
 
 class SecondStageRunner:
     def __init__(self, config):
@@ -191,6 +199,7 @@ class SecondStageRunner:
         sys.stdout.flush()
 
     def eval(self, epoch, data):
+        self.model.eval()
         all_pred_sentence, all_real_sentence = [], []
         all_pred_grid, all_real_grid = [], []
         all_major_logits = []
@@ -207,10 +216,10 @@ class SecondStageRunner:
             for batch_idx, (inputs, targets) in enumerate(data_loader, 1):
                 if 'cuda' in torch_device:
                     batch_input = move_to_cuda(inputs)
-                    target = move_to_cuda(targets)
+                    targets = move_to_cuda(targets)
                 else:
                     batch_input = move_to_cpu(inputs)
-                    target = move_to_cpu(targets)
+                    targets = move_to_cpu(targets)
                 batch_input = tuple2dict(batch_input, ["sentence_embedding", "sentence_mask", "paragraph_order",
                                                        "sentence_order", "font_size", "style_mark", "coarse_logit"])
                 targets = tuple2dict(targets, ["grid", "reflection", "label", "is_major"])
@@ -267,6 +276,7 @@ class SecondStageRunner:
         return neg_loss, second_metric
 
     def test(self, epoch, test_file):
+        self.model.eval()
         test_dataset = SecondStageDataset("test", self.config, test_data_file=test_file)
         self.test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=1,
                                       pin_memory=False)

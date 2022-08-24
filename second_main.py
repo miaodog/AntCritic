@@ -43,7 +43,8 @@ if __name__ == "__main__":
     runner = SecondStageRunner(cfg)
     if args.eval_epoch != -1:
         runner.load_model(cfg.saved_path + "/models-{}.pt".format(args.eval_epoch))
-        runner.eval(args.eval_epoch, "eval")
+        print('load model: ', cfg.saved_path + "/models-{}.pt".format(args.eval_epoch))
+        # runner.eval(args.eval_epoch, "eval")
         if args.test_file:
             runner.test(args.eval_epoch, args.test_file)
     else:
