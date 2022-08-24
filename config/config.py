@@ -6,10 +6,9 @@ _c = CN()
 BASEDIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 print('BASEDIR: ', BASEDIR)
 _c.display_interval = 10
-# _c.saved_path = "new_checkpoints/second_1" # "/home/wenyu.zy/argument/checkpoints/second"
-# _c.saved_path = "/mnt/fengyao.hjj/argument_mining/new_checkpoints/new_char"
-# _c.saved_path = "/mnt/fengyao.hjj/argument_mining/new_checkpoints/new_word"
-# _c.saved_path = "/mnt/fengyao.hjj/argument_mining/new_checkpoints/second_gru_nofl_8"
+# _c.saved_path = os.path.join(BASEDIR, "checkpoints/char")
+# _c.saved_path = os.path.join(BASEDIR, "checkpoints/word")
+_c.saved_path = os.path.join(BASEDIR, "checkpoints/second_gru_nofl_8")
 
 _c.max_epoch = 12
 _c.text_embd_dims = 768

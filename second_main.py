@@ -19,8 +19,9 @@ def parse_args():
     parser.add_argument('--test-file', type=str, default=None)
     return parser.parse_args()
 
-
-BASEDIR = '/mnt/fengyao.hjj/argument_mining/'
+import os
+BASEDIR = os.path.dirname(os.path.realpath(__file__))
+print('BASEDIR: ', BASEDIR)
 if __name__ == "__main__":
     """
     CUDA_VISIBLE_DEVICES=0,1 /mnt/fengyao.hjj/miniconda3/envs/antmmf/bin/python \
@@ -37,7 +38,7 @@ if __name__ == "__main__":
     args = parse_args()
     cfg = get_cfg_defaults()
     if args.config is not None:
-        cfg.merge_from_file(BASEDIR + "config/" + args.config + ".yaml")
+        cfg.merge_from_file(os.path.join(BASEDIR, 'config', args.config + ".yaml"))
     cfg.freeze()
     runner = SecondStageRunner(cfg)
     if args.eval_epoch != -1:

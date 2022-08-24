@@ -15,10 +15,14 @@ from loss import calc_second_loss
 from metrics import calc_second_metric
 from runner.optimizer import GradualWarmupScheduler
 from utils.container import metricsContainer
-from utils.helper import move_to_cuda
+from utils.helper import move_to_cuda, move_to_cpu
 from utils.processor import tuple2dict
 from utils.timer import Timer
 import pandas as pd
+torch_device = 'cuda' if torch.cuda.is_available() else 'cpu'
+print(f'torch_device: {torch_device}')
+if 'cuda' not in torch_device:
+    os.environ['OMP_NUM_THREADS'] = '1'
 
 class SecondStageRunner:
     def __init__(self, config):
@@ -43,8 +47,9 @@ class SecondStageRunner:
         print(self.config)
         self.model_saved_path = self.config["saved_path"]
         os.makedirs(self.model_saved_path, mode=0o755, exist_ok=True)
-        self.device_ids = list(range(len(os.environ['CUDA_VISIBLE_DEVICES'].split(','))))
-        print('GPU: {}'.format(os.environ['CUDA_VISIBLE_DEVICES'].split(',')))
+        if 'cuda' in torch_device:
+            self.device_ids = list(range(len(os.environ['CUDA_VISIBLE_DEVICES'].split(','))))
+            print('GPU: {}'.format(os.environ['CUDA_VISIBLE_DEVICES'].split(',')))
         self.initial_epoch = 0
 
     def _init_dataset(self, config):
@@ -59,8 +64,12 @@ class SecondStageRunner:
                                       pin_memory=False)
 
     def _init_model(self, model_config):
-        self.model = getattr(models, model_config["name"])(**model_config).cuda()
-        self.model = nn.DataParallel(self.model, device_ids=self.device_ids)
+        self.model = getattr(models, model_config["name"])(**model_config).to(torch_device)
+        if 'cuda' in torch_device:
+            self.device_ids = list(range(len(os.environ['CUDA_VISIBLE_DEVICES'].split(','))))
+            self.model = nn.DataParallel(self.model, device_ids=self.device_ids)
+        else:
+            self.model = nn.DataParallel(self.model)
 
     def _init_optimizer(self, config):
         self.optimizer = torch.optim.AdamW(list(self.model.parameters()),
@@ -79,8 +88,12 @@ class SecondStageRunner:
         total_time = []
         for batch_idx, (inputs, targets) in enumerate(self.train_loader, 1):
             self.optimizer.zero_grad()
-            batch_input = move_to_cuda(inputs)
-            target = move_to_cuda(targets)
+            if 'cuda' in torch_device:
+                batch_input = move_to_cuda(inputs)
+                target = move_to_cuda(targets)
+            else:
+                batch_input = move_to_cpu(inputs)
+                target = move_to_cpu(targets)
             batch_input = tuple2dict(batch_input, ["sentence_embedding", "sentence_mask", "paragraph_order",
                                                    "sentence_order", "font_size", "style_mark", "coarse_logit"])
             target = tuple2dict(target, ["grid", "reflection", "label", "is_major"])
@@ -135,7 +148,7 @@ class SecondStageRunner:
         print('save models to {}, epoch {}.'.format(path, epoch))
 
     def load_model(self, path):
-        state_dict = torch.load(path)
+        state_dict = torch.load(path, map_location=torch.device(torch_device))
         self.initial_epoch = state_dict['epoch']
         self.main_scheduler.step(self.initial_epoch)
         parameters = state_dict['model_parameters']
@@ -192,8 +205,12 @@ class SecondStageRunner:
             raise NotImplementedError
         with torch.no_grad():
             for batch_idx, (inputs, targets) in enumerate(data_loader, 1):
-                batch_input = move_to_cuda(inputs)
-                targets = move_to_cuda(targets)
+                if 'cuda' in torch_device:
+                    batch_input = move_to_cuda(inputs)
+                    target = move_to_cuda(targets)
+                else:
+                    batch_input = move_to_cpu(inputs)
+                    target = move_to_cpu(targets)
                 batch_input = tuple2dict(batch_input, ["sentence_embedding", "sentence_mask", "paragraph_order",
                                                        "sentence_order", "font_size", "style_mark", "coarse_logit"])
                 targets = tuple2dict(targets, ["grid", "reflection", "label", "is_major"])
@@ -260,7 +277,10 @@ class SecondStageRunner:
         data_loader = self.test_loader
         with torch.no_grad():
             for batch_idx, (inputs, _) in enumerate(data_loader, 1):
-                batch_input = move_to_cuda(inputs)
+                if 'cuda' in torch_device:
+                    batch_input = move_to_cuda(inputs)
+                else:
+                    batch_input = move_to_cpu(inputs)
                 batch_input = tuple2dict(batch_input, ["sentence_embedding", "sentence_mask", "paragraph_order",
                                                        "sentence_order", "font_size", "style_mark", "coarse_logit"])
                 output = self.model(**batch_input)
