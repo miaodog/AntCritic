@@ -52,7 +52,7 @@ class ArgumentMining:
             cfg.merge_from_file(os.path.join(BASEDIR, self.config.model_config))
         cfg.freeze()
         self.model_config = cfg.model
-        print('self.model_config: ', self.model_config)
+        op_logger('self.model_config: ', self.model_config)
         self.char_model_path = self.config.char_model_path
         self.word_model_path = self.config.word_model_path
         self.model_name_or_path = self.config.model_name_or_path
@@ -70,7 +70,7 @@ class ArgumentMining:
 
         self.char_model, self.word_model = generate_models(char_model_path, word_model_path, char_pretrained, word_pretrained)
         self._init_model(self.model_config)
-        print('self.model: ', self.model)
+        op_logger('self.model: ', self.model)
         # state_dict = torch.load(self.model_name_or_path, map_location=torch.device(torch_device))
         # parameters = state_dict['model_parameters']
         # self.model.load_state_dict(parameters)
@@ -80,7 +80,7 @@ class ArgumentMining:
         parameters = state_dict['model_parameters']
         self.model.module.load_state_dict(parameters)
         self.model.eval()
-        print('Load models from {}.'.format(self.model_name_or_path))
+        op_logger('Load models from {}.'.format(self.model_name_or_path))
 
     def _init_model(self, model_config):
         self.model = getattr(models, self.model_config["name"])(**model_config).to(torch_device)
@@ -137,7 +137,7 @@ class ArgumentMining:
             result = copy.deepcopy(annotation)
 
             if len(tags) > MAX_PASSAGE_LEN:
-                print(f"Too Long Passage")
+                op_logger(f"Too Long Passage")
             para_order, sent_order, font_size, style_mark = transform_tags(tags)
             # 0: others, 1: claim, 2: premise
             logits, embedding = get_sentence_results(sentences)
@@ -232,8 +232,8 @@ class ArgumentMining:
                                   'score': max(major_logits.tolist()),
                                   'extTag': {'id': f'{content_id}_majorclaim', 'sents': [str(np.argmax(major_logits.tolist()))]}
                               })
-        for re in result:
-            print(json.dumps(re, indent=4, ensure_ascii=False))
+        # for re in result:
+        #     print(json.dumps(re, indent=4, ensure_ascii=False))
         self.end = time.time()
         op_logger.info(f'result: {result}')
         return result
@@ -268,7 +268,6 @@ class ArgumentMining:
             result["error_msg"] = ("postprocess error: %s" % s[1])
             session.cf_response = result
         response = json.dumps({"ret": 0, "result": result}, ensure_ascii=False)
-        print('response', response)
         return response
 
 
