@@ -29,7 +29,6 @@ torch_device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 op_logger.info(f'torch_device: {torch_device}')
 MAX_PASSAGE_LEN = 400
 MAX_TEXT_LEN = 50
-op_logger.info(f'torch_device: {torch_device}')
 
 
 def convert_config(d):
@@ -52,7 +51,7 @@ class ArgumentMining:
             cfg.merge_from_file(os.path.join(BASEDIR, self.config.model_config))
         cfg.freeze()
         self.model_config = cfg.model
-        op_logger('self.model_config: ', self.model_config)
+        op_logger.info('self.model_config: ', self.model_config)
         self.char_model_path = self.config.char_model_path
         self.word_model_path = self.config.word_model_path
         self.model_name_or_path = self.config.model_name_or_path
@@ -70,7 +69,7 @@ class ArgumentMining:
 
         self.char_model, self.word_model = generate_models(char_model_path, word_model_path, char_pretrained, word_pretrained)
         self._init_model(self.model_config)
-        op_logger('self.model: ', self.model)
+        op_logger.info('self.model: ', self.model)
         # state_dict = torch.load(self.model_name_or_path, map_location=torch.device(torch_device))
         # parameters = state_dict['model_parameters']
         # self.model.load_state_dict(parameters)
@@ -80,7 +79,7 @@ class ArgumentMining:
         parameters = state_dict['model_parameters']
         self.model.module.load_state_dict(parameters)
         self.model.eval()
-        op_logger('Load models from {}.'.format(self.model_name_or_path))
+        op_logger.info('Load models from {}.'.format(self.model_name_or_path))
 
     def _init_model(self, model_config):
         self.model = getattr(models, self.model_config["name"])(**model_config).to(torch_device)
