@@ -75,4 +75,4 @@ class BlurDetService:
         # 调用op，注意此处要传入的参数
         argument_mining = cf.add_node(cf.OpNode("argument_mining"),
                                              [self.item_id_str, self.title_str, self.content_str, self.params_dict_str])
-        return (argument_mining, [self.item_id_str, self.content_str, self.params_dict_str])
+        return (argument_mining, [self.item_id_str, self.title_str, self.content_str, self.params_dict_str])
