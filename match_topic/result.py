@@ -3,6 +3,8 @@
 import codecs
 import copy
 import argparse
+import logging
+
 import pandas as pd
 from tqdm import tqdm
 import numpy as np
@@ -221,8 +223,9 @@ def beautiful_claim_premise(res):
             re['major'] = [{np.argmax(re['majors']): re['sents'][np.argmax(re['majors'])]}]
         else:
             if len(re['sents'][np.argmax(re['majors'])]) <= 7:
-                print('*****检查长度设置的是否ok？', re['sents'][np.argmax(re['majors'])],
-                      len(re['sents'][np.argmax(re['majors'])]))
+                pass
+                # print('*****检查长度设置的是否ok？', re['sents'][np.argmax(re['majors'])],
+                #       len(re['sents'][np.argmax(re['majors'])]))
             re['major'] = []
     return res
 

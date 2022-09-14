@@ -26,7 +26,7 @@ def get_hotwords(content):
         r = requests.post(url, data=datas, headers=headers, timeout=10)
         res = json.loads(r.text)
     except Exception as e:
-        print('{} - ERROR get_hotwords Exception {}'.format(datetime.now(), e.__str__()))
+        print('{} - ERROR get_hotwords Exception {}'.format(datetime.now(), e))
 
     if res.get('resultCode', 'Fail') == 'SUCCESS' and res.get('resultMap', None) \
             and res['resultMap'].get('algo_result', None) and res['resultMap']['algo_result'].strip() != "":
