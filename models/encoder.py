@@ -27,6 +27,7 @@ class InitialEncoder(nn.Module):
         self.sentence_pos_encoder = nn.Embedding(max_len + 1, dim)
         # self.all_pos_encoder = nn.Embedding(max_len + 1, dim)
         self.font_embedding = nn.Embedding(2, dim // 2)
+        print('mark_num: ', mark_num)
         self.style_embedding = nn.Embedding(mark_num, dim // 2)
         self.input_linear = nn.Sequential(
             nn.Linear(dim, dim), nn.ReLU(), nn.Dropout(dropout),
@@ -47,11 +48,13 @@ class InitialEncoder(nn.Module):
         else:
             overall_pe = self.all_pos_encoder(torch.arange(max_len).long().unsqueeze(0).to(para_pe.device))
         sentence_emb = self.input_linear(sentence_data)
+        print('self.style_embedding', self.style_embedding.weight.shape)
         style_emb = torch.mm(style_mark.reshape(-1, self.mark_num).float(),
                              self.style_embedding.weight)
         # (B * L, M) * (M, D) -> (B * L, D) -> (B, L, D)
         font_size = torch.cat((font_size == 1, font_size == 2), dim=-1)
         font_emb = torch.mm(font_size.reshape(-1, 2).float(), self.font_embedding.weight)
+
         # (B, L) -> (B, L, 2) -> (B * L, 2)
         overall_style = torch.cat((style_emb, font_emb), dim=-1).reshape_as(sentence_emb)
         if self.mode == "text":
