@@ -48,7 +48,6 @@ class InitialEncoder(nn.Module):
         else:
             overall_pe = self.all_pos_encoder(torch.arange(max_len).long().unsqueeze(0).to(para_pe.device))
         sentence_emb = self.input_linear(sentence_data)
-        print('self.style_embedding', self.style_embedding.weight.shape)
         style_emb = torch.mm(style_mark.reshape(-1, self.mark_num).float(),
                              self.style_embedding.weight)
         # (B * L, M) * (M, D) -> (B * L, D) -> (B, L, D)
