@@ -1,2 +1,4 @@
 antcritic/train.1.csv filter=lfs diff=lfs merge=lfs -text
+antcritic/test.1.csv filter=lfs diff=lfs merge=lfs -text
+antcritic/dev.1.csv filter=lfs diff=lfs merge=lfs -text
 pretrained_model filter=lfs diff=lfs merge=lfs -text
