@@ -12,3 +12,13 @@ gen
 /*.log
 __pycache__
 *.tar.gz
+
+# Ant Group internal deployment code which we will not publish
+/services
+LEGAL.md
+init.sh
+exp_run.sh
+services.sh
+show_result.py
+test_service.py
+
