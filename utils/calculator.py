@@ -183,7 +183,7 @@ def find_jaccard_overlap(set_1, set_2):
 def calculate_mAP(det_boxes, det_labels, det_scores, real_boxes, real_labels, real_difficulties, n_classes):
     """
     Calculate the Mean Average Precision (mAP) of detected objects.
-    See https://medium.com/@jonathan_hui/map-mean-average-precision-for-object-detection-45c121a31173 for an explanation
+
     :param n_classes: number of classes
     :param det_boxes: list of tensors, one tensor for each image in detected objects' bounding boxes
     :param det_labels: list of tensors, one tensor for each image in detected objects' labels
