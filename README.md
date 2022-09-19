@@ -17,5 +17,3 @@
 
 使用antcritic数据集训练的论文中Figure4所示模型:
 * checkpoints/GRU/models-7.pt
-
-
